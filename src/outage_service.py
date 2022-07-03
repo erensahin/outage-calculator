@@ -2,8 +2,9 @@
 Service that is responsible for communicating with Outage API
 """
 
-from typing import Any, Dict, List
+from typing import List
 
+from .model import Outage, SiteInfo
 from .requester import Requester
 
 
@@ -16,31 +17,34 @@ class OutageService:
         """
         self.requester = requester
 
-    def get_outages(self) -> List[Dict[str, Any]]:
+    def get_outages(self) -> List[Outage]:
         """
         Retrieves outages from the Outage API and returns them
 
         :return: list of outages
-        :rtype: List[Dict[str, Any]]
+        :rtype: List[Outage]
         """
-        return self.requester.get("outages")
+        outages = self.requester.get("outages")
+        outages = [Outage.from_dict(outage) for outage in outages]
+        return outages
 
-    def get_site_info(self, site_id: str) -> Dict[str, Any]:
+    def get_site_info(self, site_id: str) -> SiteInfo:
         """
         Retrieves information of the specified site
 
         :param site_id: site identifier
         :type site_id: str
         :return: site information dictionary
-        :rtype: Dict[str, Any]
+        :rtype: SiteInfo
         """
-        return self.requester.get(f"site-info/{site_id}")
+        site_info = self.requester.get(f"site-info/{site_id}")
+        return SiteInfo.from_dict(site_info)
 
     def post_outages_to_site(
         self,
         site_id: str,
         outages: List
-    ) -> Dict[str, Any]:
+    ) -> None:
         """
         Posts outages of the specified site to the Outage API
 
@@ -48,7 +52,7 @@ class OutageService:
         :type site_id: str
         :param outages: list of outages to post
         :type outages: List
-        :return: site information dictionary
-        :rtype: Dict[str, Any]
+        :return: None
+        :rtype: None
         """
-        return self.requester.post(f"site-outages/{site_id}", outages)
+        self.requester.post(f"site-outages/{site_id}", outages)

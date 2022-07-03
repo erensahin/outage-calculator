@@ -5,22 +5,49 @@ Unit tests for outage service
 import unittest
 from unittest import mock
 
+import dateutil.parser as dt_parser
 import requests
 
+from src.model import Device, Outage, SiteInfo
 from src.outage_service import OutageService
 from src.requester import Requester
 
 MOCK_OUTAGES = [
-    {"id": 1, "foo": "bar"},
-    {"id": 2, "foo": "baz"},
+    {
+        "id": "002b28fc",
+        "begin": "2021-07-26T17:09:31.036Z",
+        "end": "2021-08-29T00:37:42.253Z"
+    }
+]
+
+EXPECTED_OUTAGES = [
+    Outage(
+        id="002b28fc",
+        begin="2021-07-26T17:09:31.036Z",
+        end="2021-08-29T00:37:42.253Z",
+        begin_datetime=dt_parser.parse("2021-07-26T17:09:31.036Z"),
+        end_datetime=dt_parser.parse("2021-08-29T00:37:42.253Z")
+    )
 ]
 
 MOCK_SITE_INFO = {
-    "id": 1,
-    "data": [
-        {"foo", "bar"}
+    "id": "site_1",
+    "name": "Site 1",
+    "devices": [
+        {
+            "id": "002b28fc",
+            "name": "Battery 1"
+        }
     ]
 }
+
+EXPECTED_SITE_INFO = SiteInfo(
+    id="site_1",
+    name="Site 1",
+    devices=[
+        Device(id="002b28fc", name="Battery 1")
+    ]
+)
 
 
 class TestOutageService(unittest.TestCase):
@@ -38,7 +65,7 @@ class TestOutageService(unittest.TestCase):
         outages = outage_service.get_outages()
 
         mock_get.assert_called_once_with("outages")
-        self.assertListEqual(outages, MOCK_OUTAGES)
+        self.assertListEqual(outages, EXPECTED_OUTAGES)
 
     @mock.patch("src.outage_service.Requester")
     def test_get_outages_failure(self, mock_requester: Requester):
@@ -67,7 +94,7 @@ class TestOutageService(unittest.TestCase):
         site_info = outage_service.get_site_info("my_site")
 
         mock_get.assert_called_once_with("site-info/my_site")
-        self.assertDictEqual(site_info, MOCK_SITE_INFO)
+        self.assertEqual(site_info, EXPECTED_SITE_INFO)
 
     @mock.patch("src.outage_service.Requester")
     def test_get_site_info_failure(self, mock_requester: Requester):
