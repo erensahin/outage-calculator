@@ -6,19 +6,24 @@ from urllib.parse import urljoin
 from typing import Any, Dict, List, Union
 
 import requests
+from requests.adapters import HTTPAdapter, Retry
 
 
 class Requester:
 
-    def __init__(self, base_url: str, api_key: str):
+    def __init__(self, base_url: str, api_key: str, max_retries: int = 5):
         """
         :param base_url: Base API URL. (i.e. https://localhost:5000)
         :type base_url: str
         :param api_key: API key which is used for auth
         :type api_key: str
+        :param max_retries: number of retries in case request faces with an
+            unexpected response from the server. Defaults to 5
+        :type max_retries: int
         """
         self._base_url = base_url
         self._api_key = api_key
+        self._max_retries = max_retries
 
     def _get_headers(self) -> Dict[str, str]:
         """
@@ -51,6 +56,21 @@ class Requester:
 
         return res
 
+    def _get_request_session(self) -> requests.Session:
+        """
+        :return: request session instance
+        :rtype: requests.Session
+        """
+        session = requests.Session()
+        retries = Retry(
+            total=self._max_retries,
+            backoff_factor=0.1,
+            status_forcelist=[500]
+        )
+        session.mount('http://', HTTPAdapter(max_retries=retries))
+        session.mount('https://', HTTPAdapter(max_retries=retries))
+        return session
+
     def get(
         self,
         endpoint: str,
@@ -69,7 +89,8 @@ class Requester:
         :rtype: Union[List, Dict]
         """
         url = urljoin(self._base_url, endpoint)
-        res = requests.get(url, headers=self._get_headers(), params=params)
+        req_session = self._get_request_session()
+        res = req_session.get(url, headers=self._get_headers(), params=params)
         res = self._handle_response(res)
         return res.json()
 
@@ -95,7 +116,8 @@ class Requester:
         :rtype: Union[List, Dict]
         """
         url = urljoin(self._base_url, endpoint)
-        res = requests.post(
+        req_session = self._get_request_session()
+        res = req_session.post(
             url, headers=self._get_headers(), json=body, params=params)
         res = self._handle_response(res)
         return res.json()
