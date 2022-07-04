@@ -34,3 +34,17 @@ class CredentialManager:
                 f"{self._credential_file}"
             )
             raise KeyError(msg) from exc
+
+    def get_api_url(self) -> str:
+        """
+        :return: api url
+        :rtype: str
+        """
+        try:
+            return self._credentials["api_url"]
+        except KeyError as exc:
+            msg = (
+                "'api_url' is required in credential file: "
+                f"{self._credential_file}"
+            )
+            raise KeyError(msg) from exc
