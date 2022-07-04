@@ -17,7 +17,7 @@ MOCK_DATA = [
 
 class TestRequester(unittest.TestCase):
 
-    @mock.patch("src.requester.requests.get")
+    @mock.patch("src.requester.requests.Session.get")
     def test_get(self, mock_get):
         """
         test get method of Requester
@@ -38,7 +38,7 @@ class TestRequester(unittest.TestCase):
         )
         self.assertListEqual(response_data, MOCK_DATA)
 
-    @mock.patch("src.requester.requests.get")
+    @mock.patch("src.requester.requests.Session.get")
     def test_get_with_query_params(self, mock_get):
         """
         test get method of Requester with query params
@@ -62,7 +62,7 @@ class TestRequester(unittest.TestCase):
         )
         self.assertListEqual(response_data, MOCK_DATA)
 
-    @mock.patch("src.requester.requests.get")
+    @mock.patch("src.requester.requests.Session.get")
     def test_get_with_path_params(self, mock_get):
         """
         test get method of Requester with path params
@@ -83,7 +83,7 @@ class TestRequester(unittest.TestCase):
         )
         self.assertListEqual(response_data, MOCK_DATA)
 
-    @mock.patch("src.requester.requests.get")
+    @mock.patch("src.requester.requests.Session.get")
     def test_get_failure(self, mock_get):
         """
         test get method of Requester having a failure
@@ -106,7 +106,7 @@ class TestRequester(unittest.TestCase):
                 params={}
             )
 
-    @mock.patch("src.requester.requests.post")
+    @mock.patch("src.requester.requests.Session.post")
     def test_post(self, mock_post):
         """
         test post method of Requester
@@ -128,7 +128,7 @@ class TestRequester(unittest.TestCase):
         )
         self.assertDictEqual(response_data, {})
 
-    @mock.patch("src.requester.requests.post")
+    @mock.patch("src.requester.requests.Session.post")
     def test_post_with_empty_body(self, mock_post):
         """
         test post method of Requester with empty body
@@ -150,7 +150,7 @@ class TestRequester(unittest.TestCase):
         )
         self.assertDictEqual(response_data, {})
 
-    @mock.patch("src.requester.requests.post")
+    @mock.patch("src.requester.requests.Session.post")
     def test_post_with_params(self, mock_post):
         """
         test post method of Requester with query params
@@ -176,7 +176,7 @@ class TestRequester(unittest.TestCase):
         )
         self.assertDictEqual(response_data, {})
 
-    @mock.patch("src.requester.requests.post")
+    @mock.patch("src.requester.requests.Session.post")
     def test_post_with_path_params(self, mock_post):
         """
         test post method of Requester with path params
@@ -198,7 +198,7 @@ class TestRequester(unittest.TestCase):
         )
         self.assertDictEqual(response_data, {})
 
-    @mock.patch("src.requester.requests.post")
+    @mock.patch("src.requester.requests.Session.post")
     def test_post_failure(self, mock_post):
         """
         test post method of Requester having a failure
